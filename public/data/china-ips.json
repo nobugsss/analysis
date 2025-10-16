@@ -1,0 +1,42 @@
+{
+  "analysis": {
+    "totalLogs": 10,
+    "uniqueIps": 4,
+    "chinaIps": 2,
+    "foreignIps": 1
+  },
+  "chinaIps": [
+    {
+      "ip": "203.208.60.1",
+      "province": "未知",
+      "city": "未知",
+      "latitude": 34.7732,
+      "longitude": 113.722,
+      "count": 3,
+      "firstSeen": "2025-10-16 10:30:20",
+      "lastSeen": "2025-10-16 10:31:00"
+    },
+    {
+      "ip": "114.114.114.114",
+      "province": "未知",
+      "city": "未知",
+      "latitude": 34.7732,
+      "longitude": 113.722,
+      "count": 2,
+      "firstSeen": "2025-10-16 10:30:25",
+      "lastSeen": "2025-10-16 10:30:45"
+    }
+  ],
+  "provinceStats": [
+    {
+      "province": "未知",
+      "count": 5
+    }
+  ],
+  "cityStats": [
+    {
+      "city": "未知",
+      "count": 5
+    }
+  ]
+}

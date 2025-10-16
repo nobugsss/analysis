@@ -1,0 +1,64 @@
+{
+	"name": "analysis-tools",
+	"version": "1.0.0",
+	"description": "TypeScript工具集：JSON验证、简繁转换、IP日志分析、地图可视化",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"dev": "ts-node src/index.ts",
+		"test": "jest",
+		"convert": "node dist/cli/chinese-converter.js",
+		"validate": "node dist/cli/json-validator.js",
+		"analyze": "node dist/cli/log-analyzer.js",
+		"ip-analyze": "node dist/cli/ip-log-analyzer.js",
+		"map": "node dist/cli/map-visualizer.js",
+		"watch": "tsc --watch",
+		"clean": "rimraf dist",
+		"setup-maps": "node scripts/setup-google-maps.js"
+	},
+	"keywords": [
+		"typescript",
+		"json",
+		"chinese",
+		"converter",
+		"ip",
+		"log",
+		"analysis",
+		"map",
+		"visualization"
+	],
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"chalk": "^4.1.2",
+		"commander": "^11.1.0",
+		"csv-parser": "^3.0.0",
+		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
+		"fs-extra": "^11.1.1",
+		"geoip-lite": "^1.4.7",
+		"glob": "^10.3.10",
+		"moment": "^2.29.4",
+		"opencc": "^1.1.6",
+		"opencc-js": "^1.0.5",
+		"ora": "^5.4.1"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.21",
+		"@types/fs-extra": "^11.0.4",
+		"@types/jest": "^29.5.8",
+		"@types/node": "^20.8.0",
+		"jest": "^29.7.0",
+		"nodemon": "^3.0.1",
+		"rimraf": "^5.0.5",
+		"ts-node": "^10.9.1",
+		"typescript": "^5.2.2"
+	},
+	"bin": {
+		"json-validator": "./dist/cli/json-validator.js",
+		"chinese-converter": "./dist/cli/chinese-converter.js",
+		"log-analyzer": "./dist/cli/log-analyzer.js",
+		"map-visualizer": "./dist/cli/map-visualizer.js"
+	}
+}

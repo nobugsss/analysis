@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>中国IP地址分布可视化</title>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+				font-family: "Microsoft YaHei", Arial, sans-serif;
+				background-color: #f5f5f5;
+			}
+
+			.header {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				color: white;
+				padding: 20px;
+				text-align: center;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			}
+
+			.header h1 {
+				margin: 0;
+				font-size: 28px;
+				font-weight: 300;
+			}
+
+			.stats {
+				display: flex;
+				justify-content: center;
+				gap: 30px;
+				margin-top: 15px;
+			}
+
+			.stat-item {
+				text-align: center;
+			}
+
+			.stat-number {
+				font-size: 24px;
+				font-weight: bold;
+				display: block;
+			}
+
+			.stat-label {
+				font-size: 14px;
+				opacity: 0.9;
+			}
+
+			.container {
+				display: flex;
+				height: calc(100vh - 120px);
+			}
+
+			.sidebar {
+				width: 300px;
+				background: white;
+				padding: 20px;
+				box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+				overflow-y: auto;
+			}
+
+			.map-container {
+				flex: 1;
+				position: relative;
+			}
+
+			#map {
+				width: 100%;
+				height: 100%;
+			}
+
+			.section {
+				margin-bottom: 25px;
+			}
+
+			.section-title {
+				font-size: 18px;
+				font-weight: bold;
+				color: #333;
+				margin-bottom: 15px;
+				padding-bottom: 8px;
+				border-bottom: 2px solid #667eea;
+			}
+
+			.province-list,
+			.city-list {
+				max-height: 200px;
+				overflow-y: auto;
+			}
+
+			.province-item,
+			.city-item {
+				display: flex;
+				justify-content: space-between;
+				padding: 8px 12px;
+				margin: 5px 0;
+				background: #f8f9fa;
+				border-radius: 6px;
+				transition: background-color 0.2s;
+			}
+
+			.province-item:hover,
+			.city-item:hover {
+				background: #e9ecef;
+			}
+
+			.province-name,
+			.city-name {
+				font-weight: 500;
+				color: #495057;
+			}
+
+			.province-count,
+			.city-count {
+				color: #667eea;
+				font-weight: bold;
+			}
+
+			.loading {
+				text-align: center;
+				padding: 50px;
+				color: #666;
+			}
+
+			.error {
+				text-align: center;
+				padding: 50px;
+				color: #dc3545;
+			}
+
+			.info-window {
+				background: white;
+				padding: 15px;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+				max-width: 250px;
+			}
+
+			.info-title {
+				font-size: 16px;
+				font-weight: bold;
+				color: #333;
+				margin-bottom: 10px;
+			}
+
+			.info-item {
+				margin: 5px 0;
+				font-size: 14px;
+				color: #666;
+			}
+
+			.info-label {
+				font-weight: 500;
+				color: #495057;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header">
+			<h1>中国IP地址分布可视化</h1>
+			<div class="stats">
+				<div class="stat-item">
+					<span class="stat-number" id="totalLogs">-</span>
+					<span class="stat-label">总日志数</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-number" id="uniqueIps">-</span>
+					<span class="stat-label">唯一IP</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-number" id="chinaIps">-</span>
+					<span class="stat-label">中国IP</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-number" id="foreignIps">-</span>
+					<span class="stat-label">海外IP</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="sidebar">
+				<div class="section">
+					<div class="section-title">省份分布</div>
+					<div class="province-list" id="provinceList">
+						<div class="loading">加载中...</div>
+					</div>
+				</div>
+
+				<div class="section">
+					<div class="section-title">城市分布</div>
+					<div class="city-list" id="cityList">
+						<div class="loading">加载中...</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="map-container">
+				<div id="map"></div>
+			</div>
+		</div>
+
+		<script>
+			let map;
+			let markers = [];
+			let chinaIpsData = [];
+
+			// 初始化地图
+			function initMap() {
+				// 中国中心坐标
+				const chinaCenter = { lat: 35.8617, lng: 104.1954 };
+
+				map = new google.maps.Map(document.getElementById("map"), {
+					zoom: 5,
+					center: chinaCenter,
+					mapTypeId: google.maps.MapTypeId.ROADMAP,
+					styles: [
+						{
+							featureType: "water",
+							elementType: "geometry",
+							stylers: [{ color: "#e9e9e9" }, { lightness: 17 }]
+						},
+						{
+							featureType: "landscape",
+							elementType: "geometry",
+							stylers: [{ color: "#f5f5f5" }, { lightness: 20 }]
+						},
+						{
+							featureType: "road.highway",
+							elementType: "geometry.fill",
+							stylers: [{ color: "#ffffff" }, { lightness: 17 }]
+						},
+						{
+							featureType: "road.highway",
+							elementType: "geometry.stroke",
+							stylers: [{ color: "#ffffff" }, { lightness: 29 }, { weight: 0.2 }]
+						}
+					]
+				});
+
+				loadData();
+			}
+
+			// 加载数据
+			async function loadData() {
+				try {
+					const response = await fetch("/api/china-ips");
+					const data = await response.json();
+
+					if (data.error) {
+						showError(data.error);
+						return;
+					}
+
+					// 更新统计信息
+					updateStats(data.analysis);
+
+					// 更新省份列表
+					updateProvinceList(data.provinceStats);
+
+					// 更新城市列表
+					updateCityList(data.cityStats);
+
+					// 在地图上显示IP
+					chinaIpsData = data.chinaIps;
+					showIpsOnMap(data.chinaIps);
+				} catch (error) {
+					showError("加载数据失败: " + error.message);
+				}
+			}
+
+			// 更新统计信息
+			function updateStats(analysis) {
+				document.getElementById("totalLogs").textContent = analysis.totalLogs;
+				document.getElementById("uniqueIps").textContent = analysis.uniqueIps;
+				document.getElementById("chinaIps").textContent = analysis.chinaIps;
+				document.getElementById("foreignIps").textContent = analysis.foreignIps;
+			}
+
+			// 更新省份列表
+			function updateProvinceList(provinceStats) {
+				const container = document.getElementById("provinceList");
+				container.innerHTML = "";
+
+				provinceStats.forEach((stat) => {
+					const item = document.createElement("div");
+					item.className = "province-item";
+					item.innerHTML = `
+                    <span class="province-name">${stat.province}</span>
+                    <span class="province-count">${stat.count}</span>
+                `;
+					container.appendChild(item);
+				});
+			}
+
+			// 更新城市列表
+			function updateCityList(cityStats) {
+				const container = document.getElementById("cityList");
+				container.innerHTML = "";
+
+				cityStats.slice(0, 10).forEach((stat) => {
+					const item = document.createElement("div");
+					item.className = "city-item";
+					item.innerHTML = `
+                    <span class="city-name">${stat.city}</span>
+                    <span class="city-count">${stat.count}</span>
+                `;
+					container.appendChild(item);
+				});
+			}
+
+			// 在地图上显示IP
+			function showIpsOnMap(ips) {
+				// 清除现有标记
+				markers.forEach((marker) => marker.setMap(null));
+				markers = [];
+
+				// 按访问次数分组
+				const ipGroups = {};
+				ips.forEach((ip) => {
+					const key = `${ip.latitude},${ip.longitude}`;
+					if (!ipGroups[key]) {
+						ipGroups[key] = {
+							latitude: ip.latitude,
+							longitude: ip.longitude,
+							province: ip.province,
+							city: ip.city,
+							ips: [],
+							totalCount: 0
+						};
+					}
+					ipGroups[key].ips.push(ip);
+					ipGroups[key].totalCount += ip.count;
+				});
+
+				// 创建标记
+				Object.values(ipGroups).forEach((group) => {
+					const marker = new google.maps.Marker({
+						position: { lat: group.latitude, lng: group.longitude },
+						map: map,
+						title: `${group.province} ${group.city}`,
+						icon: {
+							url:
+								"data:image/svg+xml;charset=UTF-8," +
+								encodeURIComponent(`
+                            <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="15" cy="15" r="12" fill="#667eea" stroke="#fff" stroke-width="2"/>
+                                <text x="15" y="19" text-anchor="middle" fill="white" font-size="12" font-weight="bold">
+                                    ${group.totalCount}
+                                </text>
+                            </svg>
+                        `),
+							scaledSize: new google.maps.Size(30, 30)
+						}
+					});
+
+					// 创建信息窗口
+					const infoWindow = new google.maps.InfoWindow({
+						content: createInfoWindowContent(group)
+					});
+
+					marker.addListener("click", () => {
+						infoWindow.open(map, marker);
+					});
+
+					markers.push(marker);
+				});
+			}
+
+			// 创建信息窗口内容
+			function createInfoWindowContent(group) {
+				const uniqueIps = group.ips.length;
+				const totalCount = group.totalCount;
+
+				return `
+                <div class="info-window">
+                    <div class="info-title">${group.province} ${group.city}</div>
+                    <div class="info-item">
+                        <span class="info-label">唯一IP:</span> ${uniqueIps}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">总访问:</span> ${totalCount}
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">坐标:</span> ${group.latitude.toFixed(4)}, ${group.longitude.toFixed(4)}
+                    </div>
+                </div>
+            `;
+			}
+
+			// 显示错误
+			function showError(message) {
+				document.getElementById("provinceList").innerHTML = `<div class="error">${message}</div>`;
+				document.getElementById("cityList").innerHTML = `<div class="error">${message}</div>`;
+			}
+		</script>
+
+		<!-- Google Maps API -->
+		<script>
+			// 获取API密钥
+			const apiKey = '${process.env.GOOGLE_MAPS_API_KEY || "YOUR_API_KEY"}';
+
+			// 检查API密钥
+			if (apiKey === "YOUR_API_KEY") {
+				document.body.innerHTML = `
+					<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #f5f5f5;">
+						<div style="text-align: center; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+							<h2 style="color: #dc3545; margin-bottom: 20px;">⚠️ Google Maps API密钥未配置</h2>
+							<p style="color: #666; margin-bottom: 20px;">请先配置Google Maps API密钥</p>
+							<div style="background: #f8f9fa; padding: 20px; border-radius: 5px; text-align: left;">
+								<p style="margin: 5px 0;"><strong>步骤：</strong></p>
+								<p style="margin: 5px 0;">1. 访问 <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></p>
+								<p style="margin: 5px 0;">2. 启用 Maps JavaScript API</p>
+								<p style="margin: 5px 0;">3. 创建API密钥</p>
+								<p style="margin: 5px 0;">4. 编辑 .env 文件，设置 GOOGLE_MAPS_API_KEY</p>
+								<p style="margin: 5px 0;">5. 重新启动服务</p>
+							</div>
+						</div>
+					</div>
+				`;
+			} else {
+				// 加载Google Maps API
+				const script = document.createElement("script");
+				script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
+				script.async = true;
+				script.defer = true;
+				document.head.appendChild(script);
+			}
+		</script>
+	</body>
+</html>

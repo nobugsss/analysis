@@ -1,0 +1,26 @@
+{
+  "name": "无效JSON文件",
+  "description": "这是一个无效的JSON文件示例",
+  "version": "1.0.0",
+  "author": "boykaaa",
+  "features": [
+    "JSON验证",
+    "简繁转换",
+    "IP日志分析",
+    "地图可视化"
+  ],
+  "config": {
+    "debug": true,
+    "port": 3000,
+    "database": {
+      "host": "localhost",
+      "port": 5432,
+      "name": "analysis_db"
+    }
+  },
+  "metadata": {
+    "created": "2025-10-16",
+    "updated": "2025-10-16",
+    "tags": ["typescript", "nodejs", "tools"]
+  }
+  // 这里缺少闭合括号，导致JSON无效
