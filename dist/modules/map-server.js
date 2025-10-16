@@ -41,7 +41,7 @@ exports.startMapServer = startMapServer;
  * @Author: boykaaa
  * @Date: 2025-10-16 15:20:00
  * @LastEditors: boykaaa
- * @LastEditTime: 2025-10-16 17:20:10
+ * @LastEditTime: 2025-10-16 21:22:50
  * @description: 地图可视化服务器
  * @param:
  * @return:
@@ -65,7 +65,9 @@ async function startMapServer(port) {
     console.log("环境变量长度:", process.env["GOOGLE_MAPS_API_KEY"]?.length || 0);
     console.log("=====================");
     // 设置静态文件目录
-    app.use(express_1.default.static(path.join(__dirname, "../../public")));
+    // app.use(express.static(path.join(__dirname, "../../public")));
+    // 只服务特定目录，不包含index.html
+    app.use("/static", express_1.default.static(path.join(__dirname, "../../public")));
     // 确保数据目录存在
     await fs.ensureDir(path.join(__dirname, "../../public/data"));
     // 主页路由
