@@ -48,29 +48,23 @@ npm install
 
 ## Google Maps API密钥配置
 
-**重要：** 使用地图可视化功能需要Google Maps API密钥
+在使用地图可视化功能前，需要配置Google Maps API密钥。
 
-### 获取API密钥步骤：
+### 快速配置
 
-1. 访问 [Google Cloud Console](https://console.cloud.google.com/)
-2. 创建或选择一个项目
-3. 启用 **Maps JavaScript API**
-4. 创建API密钥
-5. 配置API密钥（选择以下方式之一）：
-
-#### 方式1：环境变量（推荐）
+1. 创建 `.env` 文件：
 
 ```bash
-# Windows
-set GOOGLE_MAPS_API_KEY=你的API密钥
-
-# Linux/Mac
-export GOOGLE_MAPS_API_KEY=你的API密钥
+GOOGLE_MAPS_API_KEY=您的实际API密钥
+PORT=3000
 ```
 
-#### 方式2：修改配置文件
+2. 获取API密钥：
+   - 访问 [Google Cloud Console](https://console.cloud.google.com/)
+   - 启用 "Maps JavaScript API"
+   - 创建API密钥
 
-编辑 `src/config/google-maps.ts` 文件，将 `YOUR_API_KEY` 替换为您的实际API密钥。
+3. 重新启动服务
 
 ### API密钥格式
 

@@ -2,13 +2,14 @@
  * @Author: boykaaa
  * @Date: 2025-10-16 15:00:00
  * @LastEditors: boykaaa
- * @LastEditTime: 2025-10-16 14:47:18
+ * @LastEditTime: 2025-10-16 17:16:38
  * @description: IP日志分析器 - 从日志文件提取IP并获取地理信息
  * @param:
  * @return:
  */
 import * as fs from "fs-extra";
 import * as geoip from "geoip-lite";
+import axios from "axios";
 import moment from "moment";
 
 /**
@@ -162,28 +163,106 @@ export class IpLogAnalyzer {
 	}
 
 	/**
+	 * 使用在线API获取中国IP地理信息
+	 * @param ip - IP地址
+	 * @returns 地理信息
+	 */
+	private static async getChinaIpFromApi(ip: string): Promise<any> {
+		try {
+			// 使用ip-api.com的免费服务
+			const response = await axios.get(`http://ip-api.com/json/${ip}?lang=zh-CN`, {
+				timeout: 5000
+			});
+
+			if (response.data && response.data.status === "success") {
+				return {
+					country: response.data.country,
+					countryCode: response.data.countryCode,
+					region: response.data.regionName,
+					city: response.data.city,
+					latitude: response.data.lat,
+					longitude: response.data.lon,
+					timezone: response.data.timezone,
+					isp: response.data.isp
+				};
+			}
+			return null;
+		} catch (error) {
+			console.warn(`API查询失败 ${ip}:`, error instanceof Error ? error.message : "未知错误");
+			return null;
+		}
+	}
+
+	/**
 	 * 获取IP的地理信息
 	 * @param ip - IP地址
 	 * @returns 地理信息
 	 */
-	static getIpGeoInfo(ip: string): IpGeoInfo | null {
+	static async getIpGeoInfo(ip: string): Promise<IpGeoInfo | null> {
 		try {
-			const geo = geoip.lookup(ip);
+			// 首先尝试使用在线API获取更准确的信息
+			let geo: any = null;
+			let dataSource = "none";
+
+			try {
+				geo = await this.getChinaIpFromApi(ip);
+				if (geo) {
+					dataSource = "api";
+					console.log(`在线API查询 ${ip}:`, {
+						country: geo.country,
+						region: geo.region,
+						city: geo.city,
+						latitude: geo.latitude,
+						longitude: geo.longitude
+					});
+				}
+			} catch (apiError) {
+				console.warn(`在线API查询失败 ${ip}:`, apiError);
+			}
+
+			// 如果API查询失败，回退到geoip-lite
+			if (!geo) {
+				geo = geoip.lookup(ip);
+				if (geo) {
+					dataSource = "geoip-lite";
+				}
+			}
+
 			if (!geo) {
 				return null;
 			}
 
-			const isChina = geo.country === this.CHINA_COUNTRY_CODE;
-			const province = this.getProvinceFromRegion(geo.region);
+			const isChina = geo.countryCode === this.CHINA_COUNTRY_CODE || geo.country === "中国";
+			let province: string;
+			let city: string;
+			let latitude: number;
+			let longitude: number;
+			let timezone: string;
+
+			if (dataSource === "api") {
+				// 使用在线API的结果
+				province = geo.region || "未知";
+				city = geo.city || "未知";
+				latitude = geo.latitude || 0;
+				longitude = geo.longitude || 0;
+				timezone = geo.timezone || "UTC";
+			} else {
+				// 使用geoip-lite的结果
+				province = isChina ? this.getProvinceFromRegion(geo.region) : geo.region || "未知";
+				city = geo.city || "未知";
+				latitude = geo.ll[0];
+				longitude = geo.ll[1];
+				timezone = geo.timezone || "UTC";
+			}
 
 			return {
 				ip,
 				country: geo.country || "未知",
-				province: isChina ? province : geo.region || "未知",
-				city: geo.city || "未知",
-				latitude: geo.ll[0],
-				longitude: geo.ll[1],
-				timezone: geo.timezone || "UTC",
+				province,
+				city,
+				latitude,
+				longitude,
+				timezone,
 				isChina,
 				count: 0, // 将在后续统计中设置
 				firstSeen: "",
@@ -288,7 +367,7 @@ export class IpLogAnalyzer {
 
 		// 获取地理信息
 		for (const ip of ips) {
-			const geoInfo = this.getIpGeoInfo(ip);
+			const geoInfo = await this.getIpGeoInfo(ip);
 			if (geoInfo) {
 				const count = ipCountMap.get(ip) || 0;
 				const timeInfo = ipTimeMap.get(ip);

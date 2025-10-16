@@ -71,11 +71,17 @@ export declare class IpLogAnalyzer {
      */
     static extractIps(logEntries: LogEntry[]): string[];
     /**
+     * 使用在线API获取中国IP地理信息
+     * @param ip - IP地址
+     * @returns 地理信息
+     */
+    private static getChinaIpFromApi;
+    /**
      * 获取IP的地理信息
      * @param ip - IP地址
      * @returns 地理信息
      */
-    static getIpGeoInfo(ip: string): IpGeoInfo | null;
+    static getIpGeoInfo(ip: string): Promise<IpGeoInfo | null>;
     /**
      * 根据地区代码获取省份名称
      * @param region - 地区代码
