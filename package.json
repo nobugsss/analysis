@@ -7,6 +7,22 @@
 		"build": "tsc --project tsconfig.build.json",
 		"start": "node dist/index.js",
 		"dev": "pnpm run build && pnpm start",
+		
+		"dev:start": "tsx src/index.ts",
+		"dev:validate": "tsx src/cli/json-validator.ts",
+		"dev:convert": "tsx src/cli/chinese-converter.ts",
+		"dev:analyze": "tsx src/cli/log-analyzer.ts",
+		"dev:ip-analyze": "tsx src/cli/ip-log-analyzer.ts",
+		"dev:map": "tsx src/cli/map-visualizer.ts",
+		"dev:watch": "nodemon --exec tsx src/index.ts",
+		
+		"debug:start": "TS_NODE_PROJECT=tsconfig.json node --inspect-brk -r ts-node/register src/index.ts",
+		"debug:validate": "TS_NODE_PROJECT=tsconfig.json node --inspect-brk -r ts-node/register src/cli/json-validator.ts",
+		"debug:convert": "TS_NODE_PROJECT=tsconfig.json node --inspect-brk -r ts-node/register src/cli/chinese-converter.ts",
+		"debug:analyze": "TS_NODE_PROJECT=tsconfig.json node --inspect-brk -r ts-node/register src/cli/log-analyzer.ts",
+		"debug:ip-analyze": "TS_NODE_PROJECT=tsconfig.json node --inspect-brk -r ts-node/register src/cli/ip-log-analyzer.ts",
+		"debug:map": "TS_NODE_PROJECT=tsconfig.json node --inspect-brk -r ts-node/register src/cli/map-visualizer.ts",
+		
 		"test": "jest",
 		"convert": "node dist/cli/chinese-converter.js",
 		"validate": "node dist/cli/json-validator.js",

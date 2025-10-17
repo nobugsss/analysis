@@ -4,7 +4,7 @@
 		"module": "CommonJS",
 		"moduleResolution": "node",
 		"allowImportingTsExtensions": false,
-		"noEmit": true,
+		"noEmit": false,
 		"lib": ["ES2020"],
 		"outDir": "./dist",
 		"rootDir": "./src",
@@ -33,10 +33,10 @@
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist", "tests"],
 	"ts-node": {
-		"esm": true,
+		"esm": false,
 		"experimentalSpecifierResolution": "node",
 		"compilerOptions": {
-			"module": "ESNext",
+			"module": "CommonJS",
 			"moduleResolution": "node",
 			"target": "ES2020"
 		}

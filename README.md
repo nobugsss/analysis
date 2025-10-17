@@ -53,6 +53,26 @@ TypeScript工具集，包含以下功能：
    ```
 
 3. **运行示例**
+   
+   **开发模式（推荐，无需构建）：**
+   ```bash
+   # 查看所有可用命令
+   pnpm run dev:start
+   
+   # JSON验证示例
+   pnpm run dev:validate examples/valid.json
+   
+   # 简繁转换示例
+   pnpm run dev:convert --input examples/simplified.txt --output examples/traditional.txt --mode s2t
+   
+   # IP日志分析示例
+   pnpm run dev:ip-analyze --input examples/sample.log --verbose
+   
+   # IP日志分析并启动地图可视化
+   pnpm run dev:ip-analyze --input examples/sample.log --map --port 3000
+   ```
+   
+   **生产模式（需要先构建）：**
    ```bash
    # 查看所有可用命令
    pnpm start
@@ -70,7 +90,12 @@ TypeScript工具集，包含以下功能：
    pnpm run ip-analyze --input examples/sample.log --map --port 3000
    ```
 
-4. **访问地图可视化**
+4. **调试代码（可选）**
+   - 在 VS Code 中设置断点（点击行号左侧）
+   - 按 `F5` 启动调试
+   - 选择对应的调试配置即可开始调试
+
+5. **访问地图可视化**
    - 打开浏览器访问 `http://localhost:3000`
    - 查看中国IP地址分布地图
 
@@ -308,7 +333,51 @@ examples/                # 示例文件
 
 ## 开发环境
 
-### 开发模式
+### 开发模式（推荐）
+
+**直接运行 TypeScript 源码，无需构建：**
+
+```bash
+# 主程序
+pnpm run dev:start
+
+# 各个CLI工具
+pnpm run dev:validate examples/valid.json
+pnpm run dev:convert --input examples/simplified.txt --output test.txt --mode s2t
+pnpm run dev:analyze --input examples/sample.log --output result.json
+pnpm run dev:ip-analyze --input examples/sample.log --verbose
+pnpm run dev:map --port 3000
+
+# 监听模式（文件变化时自动重启）
+pnpm run dev:watch
+```
+
+### 调试模式
+
+> 📖 **详细调试指南**：查看 [DEBUG.md](./DEBUG.md) 获取完整的调试教程和配置说明
+
+**快速开始调试**：
+1. 在 VS Code 中设置断点（点击行号左侧）
+2. 按 `F5` 启动调试
+3. 选择对应的调试配置即可开始调试
+
+**命令行调试**：
+```bash
+# 启动调试模式（会在第一行暂停，等待调试器连接）
+pnpm run debug:validate examples/valid.json
+pnpm run debug:convert --input examples/simplified.txt --output debug-test.txt --mode s2t
+pnpm run debug:ip-analyze --input examples/sample.log --verbose
+
+# 然后在浏览器中打开 chrome://inspect 连接调试器
+```
+
+**预配置的调试选项**：
+- "Debug JSON Validator" - 调试JSON验证器
+- "Debug Chinese Converter" - 调试简繁转换器
+- "Debug IP Log Analyzer" - 调试IP日志分析器
+- "Debug Main Program" - 调试主程序
+
+### 传统开发模式
 
 ```bash
 # 使用 pnpm（推荐）
@@ -326,10 +395,12 @@ yarn watch
 
 ### 开发说明
 
+- **推荐使用开发模式**：直接运行 TypeScript 源码，修改后立即生效
 - 项目使用 **CommonJS** 模块系统以确保兼容性
-- 开发模式会自动构建项目然后运行
-- 使用 `pnpm run watch` 可以监听文件变化并自动重新编译
+- 开发模式无需构建，享受完整的 TypeScript 类型检查
+- 使用 `pnpm run dev:watch` 可以监听文件变化并自动重启
 - 所有 CLI 工具都可以独立运行
+- 生产环境仍需要构建：`pnpm run build`
 
 ## 测试
 
@@ -360,6 +431,27 @@ yarn test
 - 声明文件生成
 - 源码映射
 - 路径解析
+
+## 调试指南
+
+> 📖 **完整调试教程**：查看 [DEBUG.md](./DEBUG.md) 获取详细的调试指南，包括：
+> - VS Code 调试完整教程
+> - launch.json 文件详解和配置说明
+> - 自定义调试配置方法
+> - 实际使用场景示例
+> - 调试技巧和故障排除
+
+**快速调试步骤**：
+1. 在 VS Code 中设置断点（点击行号左侧）
+2. 按 `F5` 启动调试
+3. 选择对应的调试配置
+4. 开始调试（查看变量、单步执行等）
+
+**可用的调试配置**：
+- "Debug JSON Validator" - 调试JSON验证功能
+- "Debug Chinese Converter" - 调试简繁转换功能
+- "Debug IP Log Analyzer" - 调试IP日志分析功能
+- "Debug Main Program" - 调试主程序
 
 ## 故障排除
 
@@ -393,6 +485,23 @@ yarn test
    ```
    - 运行 `pnpm install` 重新安装依赖
    - 确保使用正确的包管理器
+
+5. **调试问题**
+   ```bash
+   # 断点不生效、调试器无法连接等
+   ```
+   - 查看 [DEBUG.md](./DEBUG.md) 中的故障排除部分
+   - 确保使用 `pnpm run debug:*` 命令而不是 `pnpm run dev:*`
+   - 检查 `.vscode/launch.json` 文件是否存在
+   - 重启 VS Code 后重试
+
+6. **ts-node 模块解析错误**
+   ```bash
+   Error: Cannot find module '/path/to/src/modules/json-validator'
+   ```
+   - 确保 `TS_NODE_PROJECT=tsconfig.json` 环境变量已设置
+   - 检查 `tsconfig.json` 中的 `ts-node` 配置
+   - 尝试重新安装依赖：`pnpm install`
 
 ### 调试模式
 
