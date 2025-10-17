@@ -19,7 +19,7 @@ TypeScript工具集，包含以下功能：
 - 支持文件和目录批量转换
 - 命令行界面
 
-### 3. IP日志分析器
+### 3. 日志分析器
 
 - 解析不同IP的日志文件
 - 根据IP区域进行聚合统计
@@ -54,6 +54,18 @@ TypeScript工具集，包含以下功能：
 
 3. **运行示例**
    ```bash
+   # 查看所有可用命令
+   pnpm start
+   
+   # JSON验证示例
+   pnpm run validate examples/valid.json
+   
+   # 简繁转换示例
+   pnpm run convert --input examples/simplified.txt --output examples/traditional.txt --mode s2t
+   
+   # IP日志分析示例
+   pnpm run ip-analyze --input examples/sample.log --verbose
+   
    # IP日志分析并启动地图可视化
    pnpm run ip-analyze --input examples/sample.log --map --port 3000
    ```
@@ -390,7 +402,35 @@ pnpm run ip-analyze --input examples/sample.log --verbose
 
 # 查看构建输出
 pnpm run build --verbose
+
+# 查看主程序帮助
+pnpm start
+
+# 查看特定命令帮助
+pnpm run validate -- --help
+pnpm run convert -- --help
+pnpm run ip-analyze -- --help
 ```
+
+### 环境要求
+
+- Node.js 16.0 或更高版本
+- pnpm 7.0 或更高版本（推荐）
+- TypeScript 5.2 或更高版本
+
+### 性能优化建议
+
+1. **大文件处理**：
+   - 对于大型日志文件，建议使用 `--verbose` 选项监控进度
+   - IP分析工具会自动缓存地理信息查询结果
+
+2. **内存使用**：
+   - 处理超大文件时，工具会分批处理以避免内存溢出
+   - 建议在内存充足的环境下运行
+
+3. **网络优化**：
+   - IP地理信息查询需要网络连接
+   - 首次查询会较慢，后续相同IP会使用缓存
 
 ## 示例文件
 

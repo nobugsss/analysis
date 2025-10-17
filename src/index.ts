@@ -10,17 +10,14 @@
 import { program } from "commander";
 import chalk from "chalk";
 
-// 导入各个模块
-import "./cli/json-validator";
-import "./cli/chinese-converter";
-import "./cli/log-analyzer";
-import "./cli/map-visualizer";
+// 不导入CLI文件，避免重复的commander解析
 
 program.name("analysis-tools").description("TypeScript工具集：JSON验证、简繁转换、IP日志分析、地图可视化").version("1.0.0");
 
 program
-	.command("validate <path>")
+	.command("validate")
 	.description("验证JSON文件的有效性")
+	.argument("<path>", "要验证的文件或目录路径")
 	.option("-r, --recursive", "递归验证子目录")
 	.option("-v, --verbose", "显示详细信息")
 	.action(async (_path: string, _options: any) => {
@@ -42,7 +39,7 @@ program
 
 program
 	.command("analyze")
-	.description("IP日志分析工具")
+	.description("日志分析工具")
 	.requiredOption("-i, --input <path>", "输入日志文件路径")
 	.requiredOption("-o, --output <path>", "输出结果文件路径")
 	.option("-f, --format <format>", "输出格式: json, csv", "json")
@@ -50,6 +47,19 @@ program
 	.action(async (_options: any) => {
 		console.log(chalk.blue("使用日志分析器..."));
 		// 这里可以调用分析器
+	});
+
+program
+	.command("ip-analyze")
+	.description("IP日志分析工具")
+	.requiredOption("-i, --input <file>", "输入日志文件路径")
+	.option("-o, --output <file>", "输出分析结果文件路径")
+	.option("-v, --verbose", "显示详细信息")
+	.option("--map", "启动地图可视化服务")
+	.option("--port <port>", "地图服务端口号", "3000")
+	.action(async (_options: any) => {
+		console.log(chalk.blue("使用IP日志分析器..."));
+		// 这里可以调用IP分析器
 	});
 
 program
@@ -69,10 +79,12 @@ if (process.argv.length <= 2) {
 	console.log(chalk.yellow("可用命令:"));
 	console.log("  validate <path>     验证JSON文件的有效性");
 	console.log("  convert            简繁中文转换工具");
-	console.log("  analyze            IP日志分析工具");
+	console.log("  analyze            日志分析工具");
+	console.log("  ip-analyze         IP日志分析工具");
 	console.log("  map                中国地图IP可视化工具\n");
 	console.log(chalk.cyan("使用 --help 查看详细帮助信息"));
 	console.log(chalk.cyan("例如: npm run validate -- --help"));
+	process.exit(0);
 }
 
 program.parse();

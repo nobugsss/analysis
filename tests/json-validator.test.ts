@@ -58,8 +58,8 @@ describe("JsonValidator", () => {
 			const results = await JsonValidator.validateFiles([validJsonPath, invalidJsonPath]);
 
 			expect(results).toHaveLength(2);
-			expect(results[0].valid).toBe(true);
-			expect(results[1].valid).toBe(false);
+			expect(results[0]?.valid).toBe(true);
+			expect(results[1]?.valid).toBe(false);
 		});
 	});
 
@@ -76,9 +76,9 @@ describe("JsonValidator", () => {
 	describe("getStats", () => {
 		it("应该计算正确的统计信息", () => {
 			const results = [
-				{ valid: true, filePath: "test1.json" },
-				{ valid: true, filePath: "test2.json" },
-				{ valid: false, filePath: "test3.json" }
+				{ valid: true, filePath: "test1.json", message: "有效", size: 100, keys: 3 },
+				{ valid: true, filePath: "test2.json", message: "有效", size: 200, keys: 5 },
+				{ valid: false, filePath: "test3.json", message: "无效", size: 0, keys: 0, error: "语法错误" }
 			];
 
 			const stats = JsonValidator.getStats(results);

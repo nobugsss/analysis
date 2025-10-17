@@ -60,6 +60,7 @@
 		"json-validator": "./dist/cli/json-validator.js",
 		"chinese-converter": "./dist/cli/chinese-converter.js",
 		"log-analyzer": "./dist/cli/log-analyzer.js",
+		"ip-log-analyzer": "./dist/cli/ip-log-analyzer.js",
 		"map-visualizer": "./dist/cli/map-visualizer.js"
 	}
 }
