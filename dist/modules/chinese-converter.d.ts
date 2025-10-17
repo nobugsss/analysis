@@ -1,17 +1,18 @@
 /**
- * 转换模式枚举
+ * 转换模式常量
  */
-export declare enum ConvertMode {
-    S2T = "s2t",// 简体转繁体
-    T2S = "t2s",// 繁体转简体
-    S2TW = "s2tw",// 简体转台湾繁体
-    S2HK = "s2hk",// 简体转香港繁体
-    S2TWP = "s2twp",// 简体转台湾繁体(短语)
-    T2TW = "t2tw",// 繁体转台湾繁体
-    T2HK = "t2hk",// 繁体转香港繁体
-    T2JP = "t2jp",// 繁体转日文汉字
-    JP2T = "jp2t"
-}
+export declare const ConvertMode: {
+    readonly S2T: "s2t";
+    readonly T2S: "t2s";
+    readonly S2TW: "s2tw";
+    readonly S2HK: "s2hk";
+    readonly S2TWP: "s2twp";
+    readonly T2TW: "t2tw";
+    readonly T2HK: "t2hk";
+    readonly T2JP: "t2jp";
+    readonly JP2T: "jp2t";
+};
+export type ConvertMode = typeof ConvertMode[keyof typeof ConvertMode];
 /**
  * 文件转换结果接口
  */

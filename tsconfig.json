@@ -1,7 +1,10 @@
 {
 	"compilerOptions": {
 		"target": "ES2020",
-		"module": "commonjs",
+		"module": "CommonJS",
+		"moduleResolution": "node",
+		"allowImportingTsExtensions": false,
+		"noEmit": true,
 		"lib": ["ES2020"],
 		"outDir": "./dist",
 		"rootDir": "./src",
@@ -34,7 +37,8 @@
 		"experimentalSpecifierResolution": "node",
 		"compilerOptions": {
 			"module": "ESNext",
-			"moduleResolution": "node"
+			"moduleResolution": "node",
+			"target": "ES2020"
 		}
 	}
 }

@@ -1,0 +1,10 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"noEmit": false,
+		"allowImportingTsExtensions": false,
+		"moduleResolution": "node",
+		"module": "CommonJS",
+		"target": "ES2020"
+	}
+}

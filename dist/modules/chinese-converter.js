@@ -48,20 +48,19 @@ const path = __importStar(require("path"));
 const glob = __importStar(require("glob"));
 const opencc_js_1 = require("opencc-js");
 /**
- * 转换模式枚举
+ * 转换模式常量
  */
-var ConvertMode;
-(function (ConvertMode) {
-    ConvertMode["S2T"] = "s2t";
-    ConvertMode["T2S"] = "t2s";
-    ConvertMode["S2TW"] = "s2tw";
-    ConvertMode["S2HK"] = "s2hk";
-    ConvertMode["S2TWP"] = "s2twp";
-    ConvertMode["T2TW"] = "t2tw";
-    ConvertMode["T2HK"] = "t2hk";
-    ConvertMode["T2JP"] = "t2jp";
-    ConvertMode["JP2T"] = "jp2t"; // 日文汉字转繁体
-})(ConvertMode || (exports.ConvertMode = ConvertMode = {}));
+exports.ConvertMode = {
+    S2T: "s2t", // 简体转繁体
+    T2S: "t2s", // 繁体转简体
+    S2TW: "s2tw", // 简体转台湾繁体
+    S2HK: "s2hk", // 简体转香港繁体
+    S2TWP: "s2twp", // 简体转台湾繁体(短语)
+    T2TW: "t2tw", // 繁体转台湾繁体
+    T2HK: "t2hk", // 繁体转香港繁体
+    T2JP: "t2jp", // 繁体转日文汉字
+    JP2T: "jp2t" // 日文汉字转繁体
+};
 /**
  * 简繁中文转换器
  */
@@ -77,31 +76,31 @@ class ChineseConverter {
             // 根据模式选择对应的Locale配置
             let config;
             switch (mode) {
-                case ConvertMode.S2T:
+                case exports.ConvertMode.S2T:
                     config = opencc_js_1.Locale.from.cn;
                     break;
-                case ConvertMode.T2S:
+                case exports.ConvertMode.T2S:
                     config = opencc_js_1.Locale.to.cn;
                     break;
-                case ConvertMode.S2TW:
+                case exports.ConvertMode.S2TW:
                     config = opencc_js_1.Locale.from.tw;
                     break;
-                case ConvertMode.S2HK:
+                case exports.ConvertMode.S2HK:
                     config = opencc_js_1.Locale.from.hk;
                     break;
-                case ConvertMode.S2TWP:
+                case exports.ConvertMode.S2TWP:
                     config = opencc_js_1.Locale.from.twp;
                     break;
-                case ConvertMode.T2TW:
+                case exports.ConvertMode.T2TW:
                     config = opencc_js_1.Locale.to.tw;
                     break;
-                case ConvertMode.T2HK:
+                case exports.ConvertMode.T2HK:
                     config = opencc_js_1.Locale.to.hk;
                     break;
-                case ConvertMode.T2JP:
+                case exports.ConvertMode.T2JP:
                     config = opencc_js_1.Locale.to.jp;
                     break;
-                case ConvertMode.JP2T:
+                case exports.ConvertMode.JP2T:
                     config = opencc_js_1.Locale.from.jp;
                     break;
                 default:
@@ -179,7 +178,7 @@ class ChineseConverter {
         let result = text;
         // 根据模式选择映射表
         let mapping;
-        if (mode === ConvertMode.S2T || mode === ConvertMode.S2TW || mode === ConvertMode.S2HK || mode === ConvertMode.S2TWP) {
+        if (mode === exports.ConvertMode.S2T || mode === exports.ConvertMode.S2TW || mode === exports.ConvertMode.S2HK || mode === exports.ConvertMode.S2TWP) {
             mapping = simplifiedToTraditional;
         }
         else {
